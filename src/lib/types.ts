@@ -28,7 +28,7 @@ export interface Task {
   status: TaskStatus;
 }
 
-export type SortableTaskFields = 'date' | 'entityName' | 'taskType' | 'time' | 'contactPerson' | 'status';
+export type SortableTaskFields = 'date' | 'entityName' | 'taskType' | 'time' | 'contactPerson' | 'status' | 'note';
 
 export interface Filters {
   entityName: string;
@@ -37,6 +37,7 @@ export interface Filters {
   status: TaskStatus | 'all';
   dateFrom: Date | undefined;
   dateTo: Date | undefined;
+  note: string;
 }
 
 export interface SortConfig {

@@ -2,18 +2,17 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { PlusCircle, XIcon } from 'lucide-react';
+import { PlusCircle, XIcon, Filter } from 'lucide-react'; // Added Filter icon for instruction
 import { formatISO, parseISO, startOfDay, endOfDay } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { TaskForm } from '@/components/task-form';
 import { TaskList } from '@/components/task-list';
-// TaskFilters component is removed
 import AppHeader from '@/components/app-header';
 import useLocalStorage from '@/hooks/use-local-storage';
 import type { Task, TaskStatus, SortableTaskFields, TaskType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import type { Filters, SortConfig } from '@/lib/types'; // Adjusted to import from types
+import type { Filters, SortConfig } from '@/lib/types';
 
 
 const initialFilters: Filters = {
@@ -23,6 +22,7 @@ const initialFilters: Filters = {
   status: 'all',
   dateFrom: undefined,
   dateTo: undefined,
+  note: '',
 };
 
 const initialSortConfig: SortConfig = {
@@ -31,9 +31,11 @@ const initialSortConfig: SortConfig = {
 };
 
 const sampleTasks: Task[] = [
-  { id: '1', date: formatISO(new Date(2024, 6, 15), { representation: 'date' }), entityName: 'Acme Corp', taskType: 'Call', time: '10:00', contactPerson: 'John Doe', status: 'open', note: 'Initial discussion about new project.' },
-  { id: '2', date: formatISO(new Date(2024, 6, 16), { representation: 'date' }), entityName: 'Beta Solutions', taskType: 'Email', time: '14:30', contactPerson: 'Jane Smith', status: 'open', note: 'Send follow-up email with proposal.' },
-  { id: '3', date: formatISO(new Date(2024, 6, 14), { representation: 'date' }), entityName: 'Gamma Inc', taskType: 'Meeting', time: '11:00', contactPerson: 'Robert Brown', status: 'closed', note: 'Client onboarding meeting completed.' },
+  { id: '1', date: formatISO(new Date(2024, 6, 15), { representation: 'date' }), entityName: 'Acme Corp', taskType: 'Call', time: '10:00', contactPerson: 'John Doe', status: 'open', note: 'Initial discussion about new project. Follow up on pricing.' },
+  { id: '2', date: formatISO(new Date(2024, 6, 16), { representation: 'date' }), entityName: 'Beta Solutions', taskType: 'Email', time: '14:30', contactPerson: 'Jane Smith', status: 'open', note: 'Sent follow-up email with proposal and attached brochure.' },
+  { id: '3', date: formatISO(new Date(2024, 6, 14), { representation: 'date' }), entityName: 'Gamma Inc', taskType: 'Meeting', time: '11:00', contactPerson: 'Robert Brown', status: 'closed', note: 'Client onboarding meeting completed. Next steps outlined.' },
+  { id: '4', date: formatISO(new Date(2024, 6, 17), { representation: 'date' }), entityName: 'Delta LLC', taskType: 'Follow-up', time: '09:15', contactPerson: 'Alice Green', status: 'open', note: 'Check in after demo. Address any outstanding questions.' },
+  { id: '5', date: formatISO(new Date(2024, 6, 18), { representation: 'date' }), entityName: 'Epsilon Co.', taskType: 'Proposal', time: '16:00', contactPerson: 'Bob White', status: 'open', note: 'Finalize and send proposal document by EOD.' },
 ];
 
 
@@ -53,7 +55,7 @@ export default function Home() {
   const handleFormSubmit = (values: any, id?: string) => {
     const taskData = {
       ...values,
-      date: formatISO(values.date, { representation: 'date' }), 
+      date: formatISO(values.date, { representation: 'date' }),
     };
 
     if (id) {
@@ -92,17 +94,15 @@ export default function Home() {
 
   const handleSortChange = useCallback((field: SortableTaskFields, direction?: 'asc' | 'desc') => {
     setSortConfig((prev) => {
-      if (prev.field === field && direction === undefined) { // If same field clicked, toggle direction
+      if (prev.field === field && direction === undefined) {
         return { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
       }
-      return { field, direction: direction || 'asc' }; // Otherwise, set new field/direction
+      return { field, direction: direction || 'asc' };
     });
   }, []);
   
   const handleClearFilters = useCallback(() => {
     setFilters(initialFilters);
-    // Optionally reset sort config as well, or keep it separate
-    // setSortConfig(initialSortConfig); 
     toast({ title: "Filters Cleared", description: "All active filters have been removed."});
   }, [toast]);
 
@@ -117,6 +117,11 @@ export default function Home() {
     if (filters.contactPerson) {
       filtered = filtered.filter((task) =>
         task.contactPerson.toLowerCase().includes(filters.contactPerson.toLowerCase())
+      );
+    }
+     if (filters.note) {
+      filtered = filtered.filter((task) =>
+        task.note?.toLowerCase().includes(filters.note.toLowerCase())
       );
     }
     if (filters.taskType !== 'all') {
@@ -163,16 +168,17 @@ export default function Home() {
            filters.taskType !== 'all' || 
            filters.status !== 'all' || 
            filters.dateFrom || 
-           filters.dateTo;
+           filters.dateTo ||
+           filters.note;
   }, [filters]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <AppHeader />
       <main className="flex-grow container mx-auto p-4 md:p-6">
-        <div className="flex justify-between items-center mb-6 pt-4">
-          <h2 className="text-2xl font-semibold text-foreground">Task Log</h2>
-          <div className="flex items-center space-x-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pt-4">
+          <h2 className="text-3xl font-headline font-bold text-foreground mb-4 md:mb-0">Task Log</h2>
+          <div className="flex items-center space-x-2 w-full md:w-auto justify-end">
             {hasActiveFilters && (
               <Button variant="outline" onClick={handleClearFilters} size="default">
                 <XIcon className="mr-2 h-4 w-4" /> Clear All Filters
@@ -183,10 +189,14 @@ export default function Home() {
             </Button>
           </div>
         </div>
+        
+        <div className="text-sm text-muted-foreground mb-4 flex items-center">
+          <Filter className="h-4 w-4 mr-2 opacity-70" />
+          Use the filter icon next to the table titles to apply filters.
+        </div>
 
-        {/* TaskFilters component is removed */}
 
-        <div className="mt-2"> {/* Reduced margin-top as filters are gone */}
+        <div className="mt-2">
           <TaskList
             tasks={filteredAndSortedTasks}
             onEdit={handleOpenForm}

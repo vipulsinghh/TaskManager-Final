@@ -1,6 +1,10 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { Inter, Lato } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const lato = Lato({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-lato' });
 
 export const metadata: Metadata = {
   title: 'TaskMaster',
@@ -13,13 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${lato.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+        {/* Google Fonts are now managed by next/font */}
       </head>
-      <body className="font-body antialiased">
+      <body className="font-inter antialiased">
         {children}
         <Toaster />
       </body>
