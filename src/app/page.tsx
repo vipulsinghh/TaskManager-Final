@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { PlusCircle, XIcon, Filter } from 'lucide-react'; // Added Filter icon for instruction
-import { formatISO, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { PlusCircle, XIcon, Filter } from 'lucide-react';
+import { formatISO, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { TaskForm } from '@/components/task-form';
@@ -31,16 +31,21 @@ const initialSortConfig: SortConfig = {
 };
 
 const sampleTasks: Task[] = [
-  { id: '1', date: formatISO(new Date(2024, 6, 15), { representation: 'date' }), entityName: 'Acme Corp', taskType: 'Call', time: '10:00', contactPerson: 'John Doe', status: 'open', note: 'Initial discussion about new project. Follow up on pricing.' },
-  { id: '2', date: formatISO(new Date(2024, 6, 16), { representation: 'date' }), entityName: 'Beta Solutions', taskType: 'Email', time: '14:30', contactPerson: 'Jane Smith', status: 'open', note: 'Sent follow-up email with proposal and attached brochure.' },
-  { id: '3', date: formatISO(new Date(2024, 6, 14), { representation: 'date' }), entityName: 'Gamma Inc', taskType: 'Meeting', time: '11:00', contactPerson: 'Robert Brown', status: 'closed', note: 'Client onboarding meeting completed. Next steps outlined.' },
-  { id: '4', date: formatISO(new Date(2024, 6, 17), { representation: 'date' }), entityName: 'Delta LLC', taskType: 'Follow-up', time: '09:15', contactPerson: 'Alice Green', status: 'open', note: 'Check in after demo. Address any outstanding questions.' },
-  { id: '5', date: formatISO(new Date(2024, 6, 18), { representation: 'date' }), entityName: 'Epsilon Co.', taskType: 'Proposal', time: '16:00', contactPerson: 'Bob White', status: 'open', note: 'Finalize and send proposal document by EOD.' },
+  { id: '1', date: formatISO(subDays(new Date(), 1), { representation: 'date' }), entityName: 'Innovatech Ltd', taskType: 'Meeting', time: '10:00', contactPerson: 'Dr. Evelyn Reed', status: 'open', note: 'Discuss Q3 roadmap and AI integration strategy. Prepare presentation slides.' },
+  { id: '2', date: formatISO(subDays(new Date(), 2), { representation: 'date' }), entityName: 'Synergy Corp', taskType: 'Call', time: '14:30', contactPerson: 'Mr. Samuel Green', status: 'open', note: 'Follow up on contract renewal. Address pricing concerns.' },
+  { id: '3', date: formatISO(subDays(new Date(), 3), { representation: 'date' }), entityName: 'Momentum Dynamics', taskType: 'Email', time: '11:00', contactPerson: 'Ms. Olivia Blue', status: 'closed', note: 'Sent project proposal and NDA. Awaiting feedback.' },
+  { id: '4', date: formatISO(subDays(new Date(), 0), { representation: 'date' }), entityName: 'Quantum Solutions', taskType: 'Follow-up', time: '09:15', contactPerson: 'Mr. Ben Carter', status: 'open', note: 'Check progress on beta testing phase. Gather user feedback.' },
+  { id: '5', date: formatISO(subDays(new Date(), 4), { representation: 'date' }), entityName: 'Apex Innovations', taskType: 'Proposal', time: '16:00', contactPerson: 'Ms. Chloe White', status: 'open', note: 'Finalize and submit grant proposal. Double-check budget section.' },
+  { id: '6', date: formatISO(subDays(new Date(), 5), { representation: 'date' }), entityName: 'Starlight Ventures', taskType: 'Site Visit', time: '13:00', contactPerson: 'Mr. Leo Maxwell', status: 'closed', note: 'Facility tour completed. Assessed operational efficiency. Report submitted.' },
+  { id: '7', date: formatISO(subDays(new Date(), 1), { representation: 'date' }), entityName: 'Nova Systems', taskType: 'Demo', time: '15:00', contactPerson: 'Ms. Sofia Chen', status: 'open', note: 'Product demo for new client. Highlight key features and benefits.' },
+  { id: '8', date: formatISO(subDays(new Date(), 6), { representation: 'date' }), entityName: 'Helios Energy', taskType: 'Contract', time: '10:30', contactPerson: 'Mr. Marcus Allen', status: 'open', note: 'Review and sign service level agreement. Coordinate with legal team.' },
+  { id: '9', date: formatISO(subDays(new Date(), 2), { representation: 'date' }), entityName: 'Zenith Platforms', taskType: 'Other', time: '17:00', contactPerson: 'Ms. Isabella Rossi', status: 'closed', note: 'Internal training session on new software update. All team members attended.' },
+  { id: '10', date: formatISO(subDays(new Date(), 0), { representation: 'date' }), entityName: 'Orion Tech', taskType: 'Call', time: '09:45', contactPerson: 'Mr. Ethan Wright', status: 'open', note: 'Scheduled introductory call with potential new partner. Prepare talking points.' },
 ];
 
 
 export default function Home() {
-  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', sampleTasks);
+  const [tasks, setTasks] = useLocalStorage<Task[]>('finstack-tasks', sampleTasks);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [filters, setFilters] = useState<Filters>(initialFilters);
@@ -65,8 +70,8 @@ export default function Home() {
       toast({ title: "Task Updated", description: "The task has been successfully updated." });
     } else {
       setTasks((prevTasks) => [
-        ...prevTasks,
         { ...taskData, id: crypto.randomUUID(), status: 'open' as TaskStatus },
+        ...prevTasks,
       ]);
       toast({ title: "Task Created", description: "A new task has been successfully created." });
     }
@@ -218,7 +223,7 @@ export default function Home() {
       />
       
       <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8">
-        TaskMaster &copy; {new Date().getFullYear()}
+        FinStack &copy; {new Date().getFullYear()}
       </footer>
     </div>
   );

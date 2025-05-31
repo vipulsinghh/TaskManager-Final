@@ -4,16 +4,16 @@
 
 @layer base {
   :root {
-    --background: 210 25% 95.7%; /* #F0F4F8 */
-    --foreground: 210 25% 25%;   /* #333C46 */
+    --background: 210 60% 98%; /* #F9FAFB Very light, almost white with a hint of blue */
+    --foreground: 220 15% 25%;   /* #363C4A Dark text color */
 
     --card: 0 0% 100%;
-    --card-foreground: 210 25% 25%;
+    --card-foreground: 220 15% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 25% 25%;
+    --popover-foreground: 220 15% 25%;
 
-    --primary: 207 90% 61%;    /* #42A5F5 */
+    --primary: 215 80% 55%;    /* #3B82F6 Vibrant Blue from logo */
     --primary-foreground: 0 0% 100%; 
 
     --secondary: 210 30% 92%; 
@@ -22,15 +22,15 @@
     --muted: 210 30% 88%;
     --muted-foreground: 210 25% 55%;
 
-    --accent: 207 90% 68%;      /* #64B5F6 */
+    --accent: 215 80% 65%;      /* Lighter blue for accents/hovers */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 210 20% 85%;
-    --input: 0 0% 100%; /* Default input background, can be overridden */
-    --ring: 207 90% 61%;
+    --input: 0 0% 100%;
+    --ring: 215 80% 55%; /* Primary blue for rings */
 
     --radius: 0.5rem;
 
@@ -40,12 +40,13 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --header-primary-bg: 212 78% 15%;
-    --header-primary-foreground: 0 0% 100%;
-    --header-secondary-bg: 212 52% 25%;
-    --header-secondary-foreground: 210 20% 85%;
+    --header-primary-bg: 220 43% 18%; /* #1A2B47 - Dark Navy Blue */
+    --header-primary-foreground: 210 30% 95%; /* #ECF0F3 - Very Light Gray/Off-White */
+    
+    --header-secondary-bg: 220 40% 25%; /* #263A59 - Medium Dark Blue */
+    --header-secondary-foreground: 210 25% 85%; /* #C8D2DC - Light Gray */
 
-    --sidebar-background: 0 0% 98%; /* Default, not specifically used by TaskMaster */
+    --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -56,17 +57,16 @@
   }
 
   .dark {
-    /* Keeping dark theme variables, but TaskMaster is styled for light theme per request */
-    --background: 210 25% 10%; 
+    --background: 220 15% 10%; 
     --foreground: 210 25% 90%; 
 
-    --card: 210 25% 15%;
+    --card: 220 15% 15%;
     --card-foreground: 210 25% 90%;
 
-    --popover: 210 25% 15%;
+    --popover: 220 15% 15%;
     --popover-foreground: 210 25% 90%;
 
-    --primary: 207 90% 61%; 
+    --primary: 215 80% 55%; 
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 25% 25%;
@@ -75,15 +75,15 @@
     --muted: 210 25% 20%;
     --muted-foreground: 210 25% 65%;
 
-    --accent: 207 90% 68%; 
+    --accent: 215 80% 65%; 
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 210 20% 30%;
-    --input: 210 20% 20%; /* Dark theme input background */
-    --ring: 207 90% 61%;
+    --input: 210 20% 20%;
+    --ring: 215 80% 55%;
     
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -91,10 +91,10 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --header-primary-bg: 212 78% 12%; /* Darker for dark mode if needed */
-    --header-primary-foreground: 0 0% 95%;
-    --header-secondary-bg: 212 52% 20%; /* Darker for dark mode if needed */
-    --header-secondary-foreground: 210 20% 80%;
+    --header-primary-bg: 220 43% 15%; 
+    --header-primary-foreground: 210 30% 95%;
+    --header-secondary-bg: 220 40% 22%; 
+    --header-secondary-foreground: 210 25% 85%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

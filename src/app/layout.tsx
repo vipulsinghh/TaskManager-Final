@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const lato = Lato({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-lato' });
 
 export const metadata: Metadata = {
-  title: 'TaskMaster',
-  description: 'Manage your tasks efficiently with TaskMaster',
+  title: 'FinStack',
+  description: 'Manage your tasks efficiently with FinStack',
 };
 
 export default function RootLayout({
