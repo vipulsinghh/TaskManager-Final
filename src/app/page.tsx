@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo, useCallback } from 'react';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { TaskForm } from '@/components/task-form';
 import { TaskList } from '@/components/task-list';
 import { TaskFilters, type Filters, type SortConfig } from '@/components/task-filters';
+import AppHeader from '@/components/app-header'; // Import the new header
 import useLocalStorage from '@/hooks/use-local-storage';
 import type { Task, TaskStatus, SortableTaskFields } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -26,7 +28,6 @@ const initialSortConfig: SortConfig = {
   direction: 'desc',
 };
 
-// Sample tasks for initial state if localStorage is empty
 const sampleTasks: Task[] = [
   { id: '1', date: formatISO(new Date(2024, 6, 15), { representation: 'date' }), entityName: 'Acme Corp', taskType: 'Call', time: '10:00', contactPerson: 'John Doe', status: 'open', note: 'Initial discussion about new project.' },
   { id: '2', date: formatISO(new Date(2024, 6, 16), { representation: 'date' }), entityName: 'Beta Solutions', taskType: 'Email', time: '14:30', contactPerson: 'Jane Smith', status: 'open', note: 'Send follow-up email with proposal.' },
@@ -50,7 +51,7 @@ export default function Home() {
   const handleFormSubmit = (values: any, id?: string) => {
     const taskData = {
       ...values,
-      date: formatISO(values.date, { representation: 'date' }), // Store date as YYYY-MM-DD string
+      date: formatISO(values.date, { representation: 'date' }), 
     };
 
     if (id) {
@@ -90,7 +91,6 @@ export default function Home() {
   const handleSortChange = useCallback((field: SortableTaskFields, direction?: 'asc' | 'desc') => {
     setSortConfig((prev) => {
       if (prev.field === field && direction === undefined) {
-        // Toggle direction if same field is clicked again
         return { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
       }
       return { field, direction: direction || 'asc' };
@@ -99,7 +99,7 @@ export default function Home() {
   
   const handleClearFilters = useCallback(() => {
     setFilters(initialFilters);
-    setSortConfig(initialSortConfig); // Optionally reset sort too
+    setSortConfig(initialSortConfig);
   }, []);
 
   const filteredAndSortedTasks = useMemo(() => {
@@ -149,17 +149,16 @@ export default function Home() {
   }, [tasks, filters, sortConfig]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
-        <div className="container mx-auto p-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold">TaskMaster</h1>
-          <Button onClick={() => handleOpenForm()} variant="secondary" className="text-primary bg-primary-foreground hover:bg-primary-foreground/90">
+    <div className="min-h-screen flex flex-col bg-background">
+      <AppHeader />
+      <main className="flex-grow container mx-auto p-4 md:p-6">
+        <div className="flex justify-between items-center mb-6 pt-4"> {/* Added pt-4 for spacing from sticky header */}
+          <h2 className="text-2xl font-semibold text-foreground">Task Log</h2>
+          <Button onClick={() => handleOpenForm()} variant="default">
             <PlusCircle className="mr-2 h-5 w-5" /> Add New Task
           </Button>
         </div>
-      </header>
 
-      <main className="flex-grow container mx-auto p-4 md:p-6">
         <TaskFilters 
           filters={filters} 
           onFilterChange={handleFilterChange} 
@@ -168,12 +167,14 @@ export default function Home() {
           onClearFilters={handleClearFilters}
         />
 
-        <TaskList
-          tasks={filteredAndSortedTasks}
-          onEdit={handleOpenForm}
-          onDelete={handleDeleteTask}
-          onStatusChange={handleStatusChange}
-        />
+        <div className="mt-6"> {/* Added margin-top for spacing */}
+          <TaskList
+            tasks={filteredAndSortedTasks}
+            onEdit={handleOpenForm}
+            onDelete={handleDeleteTask}
+            onStatusChange={handleStatusChange}
+          />
+        </div>
       </main>
 
       <TaskForm
@@ -183,7 +184,7 @@ export default function Home() {
         initialData={editingTask}
       />
       
-      <footer className="text-center p-4 text-muted-foreground text-sm border-t">
+      <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8"> {/* Added mt-8 for spacing */}
         TaskMaster &copy; {new Date().getFullYear()}
       </footer>
     </div>

@@ -29,7 +29,7 @@
     --destructive-foreground: 0 0% 98%;
 
     --border: 210 20% 85%;
-    --input: 0 0% 100%;
+    --input: 0 0% 100%; /* Default input background, can be overridden */
     --ring: 207 90% 61%;
 
     --radius: 0.5rem;
@@ -39,6 +39,11 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    --header-primary-bg: 212 78% 15%;
+    --header-primary-foreground: 0 0% 100%;
+    --header-secondary-bg: 212 52% 25%;
+    --header-secondary-foreground: 210 20% 85%;
 
     --sidebar-background: 0 0% 98%; /* Default, not specifically used by TaskMaster */
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -52,8 +57,8 @@
 
   .dark {
     /* Keeping dark theme variables, but TaskMaster is styled for light theme per request */
-    --background: 210 25% 10%; /* Example: Dark version of #333C46 */
-    --foreground: 210 25% 90%; /* Example: Light version of #F0F4F8 */
+    --background: 210 25% 10%; 
+    --foreground: 210 25% 90%; 
 
     --card: 210 25% 15%;
     --card-foreground: 210 25% 90%;
@@ -61,7 +66,7 @@
     --popover: 210 25% 15%;
     --popover-foreground: 210 25% 90%;
 
-    --primary: 207 90% 61%; /* #42A5F5 */
+    --primary: 207 90% 61%; 
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 25% 25%;
@@ -70,14 +75,14 @@
     --muted: 210 25% 20%;
     --muted-foreground: 210 25% 65%;
 
-    --accent: 207 90% 68%; /* #64B5F6 */
+    --accent: 207 90% 68%; 
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 210 20% 30%;
-    --input: 210 20% 20%;
+    --input: 210 20% 20%; /* Dark theme input background */
     --ring: 207 90% 61%;
     
     --chart-1: 220 70% 50%;
@@ -85,6 +90,11 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    --header-primary-bg: 212 78% 12%; /* Darker for dark mode if needed */
+    --header-primary-foreground: 0 0% 95%;
+    --header-secondary-bg: 212 52% 20%; /* Darker for dark mode if needed */
+    --header-secondary-foreground: 210 20% 80%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
