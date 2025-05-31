@@ -19,7 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { FinStackLogo } from '@/components/icons/finstack-logo';
+// FinStackLogo is no longer used here, so the import can be removed if it's not used elsewhere.
+// For now, just commenting it out in case.
+// import { FinStackLogo } from '@/components/icons/finstack-logo'; 
 import { useIsMobile } from '@/hooks/use-mobile';
 
 
@@ -56,8 +58,8 @@ const AppHeader = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-6">
             <Link href="/" className="flex items-center">
-              <FinStackLogo className="h-8 w-4" />
-              <span className="text-2xl font-bold tracking-tight">inStack</span>
+              {/* <FinStackLogo className="h-8 w-4" /> */}
+              <span className="text-2xl font-bold tracking-tight">FinStack</span>
             </Link>
             <div className="hidden md:block">
               <Select defaultValue="companies">
