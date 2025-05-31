@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -34,7 +35,7 @@ import {
 } from '@/components/ui/select';
 import { DatePicker } from '@/components/date-picker';
 import type { Task, TaskStatus, TaskType } from '@/lib/types';
-import { addTask } from '@/lib/firebase';
+// Removed: import { addTask } from '@/lib/firebase'; // No longer directly calling this
 import { TASK_STATUSES, TASK_TYPES } from '@/lib/types';
 
 const taskFormSchema = z.object({
@@ -95,13 +96,12 @@ export function TaskForm({ open, onOpenChange, onSubmit, initialData }: TaskForm
   }, [initialData, form, open]);
 
 
-  const handleSubmit = async (values: TaskFormValues) => {
-    if (!initialData) {
-      await addTask(values); // Add task to Firestore
-    } else {
-      onSubmit(values, initialData.id);
-    }
-    onOpenChange(false);
+  const handleSubmit = (values: TaskFormValues) => {
+    // Always call the onSubmit prop passed from page.tsx
+    // This prop (handleFormSubmit in page.tsx) will trigger the correct mutation.
+    onSubmit(values, initialData?.id);
+    // The onOpenChange(false) to close the dialog is now handled
+    // in the onSuccess callbacks of the mutations in page.tsx.
   };
 
   return (
@@ -239,3 +239,5 @@ export function TaskForm({ open, onOpenChange, onSubmit, initialData }: TaskForm
     </Dialog>
   );
 }
+
+    
