@@ -4,7 +4,7 @@ import React from 'react';
 export function FinStackLogo({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 100 100"
+      viewBox="5 5 45 90"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -16,13 +16,13 @@ export function FinStackLogo({ className }: { className?: string }) {
       />
       {/* Letter F */}
       <text
-        x="32" // Positioned to be visually centered within the D-shape
-        y="51" // Vertically centered, slight adjustment for 'F' character shape
+        x="32" 
+        y="51" 
         dominantBaseline="middle"
         textAnchor="middle"
-        fontSize="40" // Adjusted font size to fit well
+        fontSize="40" 
         fontWeight="bold"
-        fill="hsl(var(--primary-foreground))" // Uses primary-foreground for contrast
+        fill="hsl(var(--primary-foreground))" 
         fontFamily="var(--font-lato), sans-serif"
       >
         F
