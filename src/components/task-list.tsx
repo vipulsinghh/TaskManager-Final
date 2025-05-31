@@ -43,7 +43,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 import type { Task, TaskStatus, TaskType, SortableTaskFields, Filters, SortConfig } from '@/lib/types';
 import { TASK_TYPES, TASK_STATUSES } from '@/lib/types';
-import { getTasks } from '@/lib/firebase';
+// Removed: import { getTasks } from '@/lib/firebase'; // No longer needed as tasks are passed as props
 
 interface TaskListProps {
   tasks: Task[];
@@ -77,11 +77,11 @@ export function TaskList({
   filters,
   sortConfig,
   onSortChange,
-  tasks, // Added tasks proper
+  tasks,
 }: TaskListProps) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Retained for consistency, though tasks are now props
   const [deleteDialogState, setDeleteDialogState] = React.useState<{isOpen: boolean, taskId: string | null}>({isOpen: false, taskId: null});
-  // The tasks are now passed as a prop from the parent, so no need to fetch here
+  
   useEffect(() => { setIsLoading(false); }, [tasks]);
 
   const openDeleteDialog = (taskId: string) => {
@@ -103,7 +103,7 @@ export function TaskList({
     if (sortConfig.field === field) {
       return sortConfig.direction === 'asc' ? <ArrowUp className="ml-1 h-3 w-3 shrink-0" /> : <ArrowDown className="ml-1 h-3 w-3 shrink-0" />;
     }
-    return <div className="w-3 h-3 ml-1 shrink-0"></div>; // Placeholder for alignment
+    return <div className="w-3 h-3 ml-1 shrink-0"></div>; 
   };
 
   const getColumnTitle = (field: SortableTaskFields) => {
@@ -112,7 +112,7 @@ export function TaskList({
         entityName: 'Entity Name',
         taskType: 'Task Type',
         time: 'Time',
-        contactPerson: 'Contact Person',
+        contactPerson: 'Contact',
         note: 'Notes',
         status: 'Status',
     };
@@ -123,15 +123,14 @@ export function TaskList({
     const isDateRange = field === 'dateFrom' || field === 'dateTo'; 
     const filterValue = isDateRange ? undefined : filters[field as Exclude<keyof Filters, 'dateFrom' | 'dateTo'>];
 
-
     return (
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="ml-1 h-6 w-6">
-            <FilterIcon className="h-3.5 w-3.5 opacity-70" />
+          <Button variant="ghost" size="icon" className="ml-0.5 h-5 w-5">
+            <FilterIcon className="h-3 w-3 opacity-60" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-3 space-y-2" align="start">
+        <PopoverContent className="w-auto p-2.5 space-y-1.5" align="start">
           <Label className="text-xs font-medium">Filter by {getColumnTitle(field as SortableTaskFields)}</Label>
           {isDateRange ? (
             <>
@@ -139,19 +138,19 @@ export function TaskList({
                 date={filters.dateFrom}
                 setDate={(date) => onFilterChange('dateFrom', date)}
                 placeholder="Start date"
-                className="w-full h-9"
+                className="w-full h-8 text-xs"
               />
               <DatePicker
                 date={filters.dateTo}
                 setDate={(date) => onFilterChange('dateTo', date)}
                 placeholder="End date"
-                className="w-full h-9"
+                className="w-full h-8 text-xs"
                 calendarProps={{
                   disabled: (d) => filters.dateFrom ? d < filters.dateFrom : false
                 }}
               />
               {(filters.dateFrom || filters.dateTo) && (
-                <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => { onFilterChange('dateFrom', undefined); onFilterChange('dateTo', undefined); }}>
+                <Button variant="ghost" size="xs" className="w-full text-xs" onClick={() => { onFilterChange('dateFrom', undefined); onFilterChange('dateTo', undefined); }}>
                   <XCircle className="mr-1 h-3 w-3" /> Clear Dates
                 </Button>
               )}
@@ -161,7 +160,7 @@ export function TaskList({
                 value={filters.taskType}
                 onValueChange={(value) => onFilterChange('taskType', value as TaskType | 'all')}
               >
-                <SelectTrigger className="h-9 text-sm">
+                <SelectTrigger className="h-8 text-xs">
                   <SelectValue placeholder="Filter type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -176,7 +175,7 @@ export function TaskList({
                 value={filters.status}
                 onValueChange={(value) => onFilterChange('status', value as TaskStatus | 'all')}
             >
-                <SelectTrigger className="h-9 text-sm">
+                <SelectTrigger className="h-8 text-xs">
                 <SelectValue placeholder="Filter status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,11 +192,11 @@ export function TaskList({
               placeholder={`Filter ${getColumnTitle(field as SortableTaskFields).toLowerCase()}...`}
               value={filterValue as string || ''}
               onChange={(e) => onFilterChange(field as Extract<keyof Filters, string>, e.target.value)}
-              className="h-9 text-sm"
+              className="h-8 text-xs"
             />
           )}
           {(filterValue && filterValue !== 'all' && !isDateRange) && (
-             <Button variant="ghost" size="sm" className="mt-1 w-full text-xs" onClick={() => onFilterChange(field as Extract<keyof Filters, string>, field === 'taskType' || field === 'status' ? 'all' : '')}>
+             <Button variant="ghost" size="xs" className="mt-1 w-full text-xs" onClick={() => onFilterChange(field as Extract<keyof Filters, string>, field === 'taskType' || field === 'status' ? 'all' : '')}>
                <XCircle className="mr-1 h-3 w-3" /> Clear
              </Button>
            )}
@@ -206,95 +205,103 @@ export function TaskList({
     );
   };
 
- if (isLoading) {
-    return <div className="text-center text-muted-foreground py-10">Loading tasks...</div>;
+ if (isLoading) { // Though tasks are props, this handles initial visual state
+    return <div className="text-center text-muted-foreground py-8">Loading tasks...</div>;
   }
-
 
   if (tasks.length === 0) {
-    return <div className="text-center text-muted-foreground py-10">No tasks found. Create a new task or adjust your filters.</div>;
+    return <div className="text-center text-muted-foreground py-8">No tasks found. Create one or adjust filters.</div>;
   }
   
-  const columns: { field: SortableTaskFields; header: string; filterable: boolean; className?: string, cellClassName?: string }[] = [
-    { field: 'date', header: 'Date', filterable: true, className: "w-[130px]"},
-    { field: 'entityName', header: 'Entity Name', filterable: true, className: "w-[200px]" },
-    { field: 'taskType', header: 'Task Type', filterable: true, className: "w-[160px]" },
-    { field: 'time', header: 'Time', filterable: false, className: "w-[100px]" },
-    { field: 'contactPerson', header: 'Contact Person', filterable: true, className: "w-[180px]" },
-    { field: 'note', header: 'Notes', filterable: true, className: "min-w-[250px]"},
-    { field: 'status', header: 'Status', filterable: true, className: "w-[120px]" },
+  const columns: { field: SortableTaskFields; header: string; filterable: boolean; className?: string }[] = [
+    { field: 'date', header: 'Date', filterable: true, className: "w-[110px]"},
+    { field: 'entityName', header: 'Entity Name', filterable: true, className: "w-[160px] min-w-[140px]" },
+    { field: 'taskType', header: 'Task Type', filterable: true, className: "w-[140px] min-w-[120px]" },
+    { field: 'time', header: 'Time', filterable: false, className: "w-[80px]" },
+    { field: 'contactPerson', header: 'Contact', filterable: true, className: "w-[150px] min-w-[130px]" },
+    { field: 'note', header: 'Notes', filterable: true, className: "min-w-[200px]"},
+    { field: 'status', header: 'Status', filterable: true, className: "w-[100px]" },
   ];
-
 
   return (
     <>
       <ScrollArea className="w-full whitespace-nowrap rounded-md border shadow-sm bg-card">
-        <Table>
+        <Table className="text-xs">
           <TableHeader>
             <TableRow>
               {columns.map((col) => (
-                <TableHead key={col.field} className={col.className}>
-                  <div className="flex items-center -ml-1"> {/* Negative margin to align with popover trigger */}
+                <TableHead key={col.field} className={`px-2 py-2 h-10 ${col.className}`}>
+                  <div className="flex items-center -ml-1">
                     <Button variant="ghost" onClick={() => onSortChange(col.field)} className="px-1 h-auto hover:bg-accent/50">
-                      <span className="text-xs font-medium">{col.header}</span>
+                      <span className="text-xs font-semibold">{col.header}</span>
                       {renderSortIcon(col.field)}
                     </Button>
                     {col.filterable && renderFilterPopover(col.field as Extract<keyof Filters, SortableTaskFields | 'dateFrom' | 'dateTo'>)}
                   </div>
                 </TableHead>
               ))}
-              <TableHead className="text-right w-[100px]">Actions</TableHead>
+              <TableHead className="sticky right-0 bg-card z-10 px-2 py-2 h-10 min-w-[70px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tasks.map((task) => {
               const TaskIcon = taskTypeIcons[task.taskType] || AlignLeft;
-              console.log("Task date type:", typeof task.date, "Task date value:", task.date);
+              let formattedDate = 'Invalid Date';
+              try {
+                if (task.date) { // Ensure task.date is not null, undefined, or empty string
+                    formattedDate = format(parseISO(task.date), 'MMM d, yy');
+                } else {
+                    formattedDate = '-'; // Or some placeholder for missing dates
+                }
+              } catch (error) {
+                console.warn(`Error parsing date for task ${task.id}: ${task.date}`, error);
+                // formattedDate remains 'Invalid Date' or you can set it to task.date or '-'
+              }
               return (
                 <TableRow key={task.id}>
-                  <TableCell className="py-2.5">{format(parseISO(task.date), 'MMM d, yyyy')}</TableCell>
-                  <TableCell className="font-medium py-2.5">{task.entityName}</TableCell>
-                  <TableCell className="py-2.5">
+                  <TableCell className="px-2 py-1.5">{formattedDate}</TableCell>
+                  <TableCell className="font-medium px-2 py-1.5">{task.entityName}</TableCell>
+                  <TableCell className="px-2 py-1.5">
                     <div className="flex items-center">
-                      <TaskIcon className="mr-2 h-4 w-4 opacity-80 shrink-0" />
+                      <TaskIcon className="mr-1.5 h-3.5 w-3.5 opacity-80 shrink-0" />
                       {task.taskType}
                     </div>
                   </TableCell>
-                  <TableCell className="py-2.5">{task.time}</TableCell>
-                  <TableCell className="py-2.5">{task.contactPerson}</TableCell>
-                  <TableCell className={`py-2.5 ${columns.find(c => c.field === 'note')?.cellClassName || ''}`}>
-                    <div className="truncate max-w-xs" title={task.note}>{task.note || '-'}</div>
+                  <TableCell className="px-2 py-1.5">{task.time}</TableCell>
+                  <TableCell className="px-2 py-1.5">{task.contactPerson}</TableCell>
+                  <TableCell className="px-2 py-1.5">
+                    <div className="truncate max-w-[200px]" title={task.note}>{task.note || '-'}</div>
                   </TableCell>
-                  <TableCell className="py-2.5">
+                  <TableCell className="px-2 py-1.5">
                     <Badge variant={task.status === 'open' ? 'secondary' : 'default'} 
-                           className={`text-xs ${task.status === 'open' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200'}`}>
+                           className={`text-[10px] px-1.5 py-0.5 ${task.status === 'open' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200'}`}>
                       {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right py-2.5">
+                  <TableCell className="sticky right-0 bg-card z-10 px-2 py-1.5 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <MoreVertical className="h-3.5 w-3.5" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="text-xs">
                         <DropdownMenuItem onClick={() => onEdit(task)}>
-                          <Edit3 className="mr-2 h-4 w-4" />
+                          <Edit3 className="mr-2 h-3.5 w-3.5" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => onStatusChange(task.id, task.status === 'open' ? 'closed' : 'open')}
                         >
                           {task.status === 'open' ? (
-                              <CheckCircle className="mr-2 h-4 w-4" />
+                              <CheckCircle className="mr-2 h-3.5 w-3.5" />
                             ) : (
-                              <XCircle className="mr-2 h-4 w-4" />
+                              <XCircle className="mr-2 h-3.5 w-3.5" />
                             )}
                           Mark as {task.status === 'open' ? 'Closed' : 'Open'}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openDeleteDialog(task.id)} className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="mr-2 h-3.5 w-3.5" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -326,3 +333,4 @@ export function TaskList({
     </>
   );
 }
+

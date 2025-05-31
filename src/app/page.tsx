@@ -228,10 +228,10 @@ export default function Home() {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <AppHeader />
-        <main className="flex-grow container mx-auto p-4 md:p-6 flex justify-center items-center">
-          <p className="text-xl text-muted-foreground">Loading tasks...</p>
+        <main className="flex-grow container mx-auto p-2 md:p-4 flex justify-center items-center">
+          <p className="text-lg text-muted-foreground">Loading tasks...</p>
         </main>
-        <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8">
+        <footer className="text-center p-4 text-muted-foreground text-xs border-t mt-6">
           FinStack &copy; {new Date().getFullYear()}
         </footer>
       </div>
@@ -242,10 +242,10 @@ export default function Home() {
      return (
       <div className="min-h-screen flex flex-col bg-background">
         <AppHeader />
-        <main className="flex-grow container mx-auto p-4 md:p-6 flex justify-center items-center">
-          <p className="text-xl text-red-500">Error loading tasks. Please try again later.</p>
+        <main className="flex-grow container mx-auto p-2 md:p-4 flex justify-center items-center">
+          <p className="text-lg text-red-500">Error loading tasks. Please try again later.</p>
         </main>
-         <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8">
+         <footer className="text-center p-4 text-muted-foreground text-xs border-t mt-6">
           FinStack &copy; {new Date().getFullYear()}
         </footer>
       </div>
@@ -256,27 +256,27 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <AppHeader />
-      <main className="flex-grow container mx-auto p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pt-4">
-          <h2 className="text-3xl font-headline font-bold text-foreground mb-4 md:mb-0">Task Log</h2>
+      <main className="flex-grow container mx-auto p-2 md:p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pt-2">
+          <h2 className="text-2xl font-headline font-bold text-foreground mb-3 md:mb-0">Task Log</h2>
           <div className="flex items-center space-x-2 w-full md:w-auto justify-end">
             {hasActiveFilters && (
-              <Button variant="outline" onClick={handleClearFilters} size="default">
-                <XIcon className="mr-2 h-4 w-4" /> Clear All Filters
+              <Button variant="outline" onClick={handleClearFilters} size="sm">
+                <XIcon className="mr-1.5 h-3.5 w-3.5" /> Clear Filters
               </Button>
             )}
-            <Button onClick={() => handleOpenForm()} variant="default" disabled={addTaskMutation.isPending || updateTaskMutation.isPending || isLoadingTasks }>
-              <PlusCircle className="mr-2 h-5 w-5" /> Add New Task
+            <Button onClick={() => handleOpenForm()} variant="default" size="sm" disabled={addTaskMutation.isPending || updateTaskMutation.isPending || isLoadingTasks }>
+              <PlusCircle className="mr-1.5 h-4 w-4" /> Add Task
             </Button>
           </div>
         </div>
         
-        <div className="text-sm text-muted-foreground mb-4 flex items-center">
-          <Filter className="h-4 w-4 mr-2 opacity-70" />
-          Use the filter icon next to the table titles to apply filters.
+        <div className="text-xs text-muted-foreground mb-3 flex items-center">
+          <Filter className="h-3.5 w-3.5 mr-1.5 opacity-70" />
+          Use the filter icon next to table titles for filtering. Click titles to sort.
         </div>
 
-        <div className="mt-2">
+        <div className="mt-1">
           <TaskList
             tasks={filteredAndSortedTasks}
             onEdit={handleOpenForm}
@@ -297,7 +297,7 @@ export default function Home() {
         initialData={editingTask}
       />
       
-      <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8">
+      <footer className="text-center p-4 text-muted-foreground text-xs border-t mt-6">
         FinStack &copy; {new Date().getFullYear()}
       </footer>
     </div>
