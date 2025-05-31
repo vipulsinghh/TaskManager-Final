@@ -2,17 +2,19 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, XIcon } from 'lucide-react';
 import { formatISO, parseISO, startOfDay, endOfDay } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { TaskForm } from '@/components/task-form';
 import { TaskList } from '@/components/task-list';
-import { TaskFilters, type Filters, type SortConfig } from '@/components/task-filters';
-import AppHeader from '@/components/app-header'; // Import the new header
+// TaskFilters component is removed
+import AppHeader from '@/components/app-header';
 import useLocalStorage from '@/hooks/use-local-storage';
-import type { Task, TaskStatus, SortableTaskFields } from '@/lib/types';
+import type { Task, TaskStatus, SortableTaskFields, TaskType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import type { Filters, SortConfig } from '@/lib/types'; // Adjusted to import from types
+
 
 const initialFilters: Filters = {
   entityName: '',
@@ -90,17 +92,19 @@ export default function Home() {
 
   const handleSortChange = useCallback((field: SortableTaskFields, direction?: 'asc' | 'desc') => {
     setSortConfig((prev) => {
-      if (prev.field === field && direction === undefined) {
+      if (prev.field === field && direction === undefined) { // If same field clicked, toggle direction
         return { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
       }
-      return { field, direction: direction || 'asc' };
+      return { field, direction: direction || 'asc' }; // Otherwise, set new field/direction
     });
   }, []);
   
   const handleClearFilters = useCallback(() => {
     setFilters(initialFilters);
-    setSortConfig(initialSortConfig);
-  }, []);
+    // Optionally reset sort config as well, or keep it separate
+    // setSortConfig(initialSortConfig); 
+    toast({ title: "Filters Cleared", description: "All active filters have been removed."});
+  }, [toast]);
 
   const filteredAndSortedTasks = useMemo(() => {
     let filtered = [...tasks];
@@ -138,8 +142,13 @@ export default function Home() {
         let comparison = 0;
         if (valA === undefined || valA === null) comparison = -1;
         else if (valB === undefined || valB === null) comparison = 1;
-        else if (valA > valB) comparison = 1;
-        else if (valA < valB) comparison = -1;
+        else if (typeof valA === 'string' && typeof valB === 'string') {
+            comparison = valA.localeCompare(valB);
+        } else if (valA > valB) {
+            comparison = 1;
+        } else if (valA < valB) {
+            comparison = -1;
+        }
         
         return sortConfig.direction === 'asc' ? comparison : -comparison;
       });
@@ -148,31 +157,45 @@ export default function Home() {
     return filtered;
   }, [tasks, filters, sortConfig]);
 
+  const hasActiveFilters = useMemo(() => {
+    return filters.entityName || 
+           filters.contactPerson || 
+           filters.taskType !== 'all' || 
+           filters.status !== 'all' || 
+           filters.dateFrom || 
+           filters.dateTo;
+  }, [filters]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <AppHeader />
       <main className="flex-grow container mx-auto p-4 md:p-6">
-        <div className="flex justify-between items-center mb-6 pt-4"> {/* Added pt-4 for spacing from sticky header */}
+        <div className="flex justify-between items-center mb-6 pt-4">
           <h2 className="text-2xl font-semibold text-foreground">Task Log</h2>
-          <Button onClick={() => handleOpenForm()} variant="default">
-            <PlusCircle className="mr-2 h-5 w-5" /> Add New Task
-          </Button>
+          <div className="flex items-center space-x-2">
+            {hasActiveFilters && (
+              <Button variant="outline" onClick={handleClearFilters} size="default">
+                <XIcon className="mr-2 h-4 w-4" /> Clear All Filters
+              </Button>
+            )}
+            <Button onClick={() => handleOpenForm()} variant="default">
+              <PlusCircle className="mr-2 h-5 w-5" /> Add New Task
+            </Button>
+          </div>
         </div>
 
-        <TaskFilters 
-          filters={filters} 
-          onFilterChange={handleFilterChange} 
-          sortConfig={sortConfig}
-          onSortChange={handleSortChange}
-          onClearFilters={handleClearFilters}
-        />
+        {/* TaskFilters component is removed */}
 
-        <div className="mt-6"> {/* Added margin-top for spacing */}
+        <div className="mt-2"> {/* Reduced margin-top as filters are gone */}
           <TaskList
             tasks={filteredAndSortedTasks}
             onEdit={handleOpenForm}
             onDelete={handleDeleteTask}
             onStatusChange={handleStatusChange}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            sortConfig={sortConfig}
+            onSortChange={handleSortChange}
           />
         </div>
       </main>
@@ -184,7 +207,7 @@ export default function Home() {
         initialData={editingTask}
       />
       
-      <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8"> {/* Added mt-8 for spacing */}
+      <footer className="text-center p-4 text-muted-foreground text-sm border-t mt-8">
         TaskMaster &copy; {new Date().getFullYear()}
       </footer>
     </div>

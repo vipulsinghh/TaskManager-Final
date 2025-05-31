@@ -1,3 +1,4 @@
+
 export type TaskStatus = 'open' | 'closed';
 
 export const TASK_STATUSES: TaskStatus[] = ['open', 'closed'];
@@ -28,3 +29,17 @@ export interface Task {
 }
 
 export type SortableTaskFields = 'date' | 'entityName' | 'taskType' | 'time' | 'contactPerson' | 'status';
+
+export interface Filters {
+  entityName: string;
+  contactPerson: string;
+  taskType: TaskType | 'all';
+  status: TaskStatus | 'all';
+  dateFrom: Date | undefined;
+  dateTo: Date | undefined;
+}
+
+export interface SortConfig {
+  field: SortableTaskFields | null; // Allow null for no sort
+  direction: 'asc' | 'desc';
+}

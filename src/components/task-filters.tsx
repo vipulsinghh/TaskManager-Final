@@ -1,3 +1,7 @@
+// This component is no longer used and can be safely deleted.
+// The filtering and sorting UI has been integrated directly into the TaskList component.
+// Keeping the file for now in case of rollback or reference, but it's not imported or used.
+/*
 "use client";
 
 import React from 'react';
@@ -181,7 +185,6 @@ export function TaskFilters({ filters, onFilterChange, sortConfig, onSortChange,
   );
 }
 
-// Minimal Card and Label for structure, assuming these are available or defined elsewhere if not from shadcn
 const Card = ({ className, children }: { className?: string, children: React.ReactNode }) => (
   <div className={cn("bg-card text-card-foreground rounded-lg border", className)}>{children}</div>
 );
@@ -190,4 +193,5 @@ const Label = ({ htmlFor, className, children }: { htmlFor?: string, className?:
   <label htmlFor={htmlFor} className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}>{children}</label>
 );
 
-import { cn } from "@/lib/utils"; // Ensure cn is imported
+import { cn } from "@/lib/utils";
+*/
