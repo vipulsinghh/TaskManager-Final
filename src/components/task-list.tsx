@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { 
   Edit3, Trash2, MoreVertical, CheckCircle, XCircle, Filter as FilterIcon, ArrowUp, ArrowDown,
@@ -41,19 +41,19 @@ import { DatePicker } from '@/components/date-picker';
 import { Label } from '@/components/ui/label';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-
 import type { Task, TaskStatus, TaskType, SortableTaskFields, Filters, SortConfig } from '@/lib/types';
 import { TASK_TYPES, TASK_STATUSES } from '@/lib/types';
+import { getTasks } from '@/lib/firebase';
 
 interface TaskListProps {
   tasks: Task[];
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
   onStatusChange: (taskId: string, newStatus: 'open' | 'closed') => void;
-  filters: Filters;
-  onFilterChange: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
-  sortConfig: SortConfig;
   onSortChange: (field: SortableTaskFields, direction?: 'asc' | 'desc') => void;
+  onFilterChange: (field: keyof Filters, value: any) => void;
+  sortConfig: SortConfig;
+  filters: Filters;
 }
 
 const taskTypeIcons: Record<TaskType, React.ElementType> = {
@@ -68,17 +68,21 @@ const taskTypeIcons: Record<TaskType, React.ElementType> = {
   "Other": Info,
 };
 
+
 export function TaskList({ 
-  tasks, 
   onEdit, 
   onDelete, 
   onStatusChange,
-  filters,
   onFilterChange,
+  filters,
   sortConfig,
-  onSortChange 
+  onSortChange,
+  tasks, // Added tasks proper
 }: TaskListProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogState, setDeleteDialogState] = React.useState<{isOpen: boolean, taskId: string | null}>({isOpen: false, taskId: null});
+  // The tasks are now passed as a prop from the parent, so no need to fetch here
+  useEffect(() => { setIsLoading(false); }, [tasks]);
 
   const openDeleteDialog = (taskId: string) => {
     setDeleteDialogState({isOpen: true, taskId});
@@ -116,7 +120,7 @@ export function TaskList({
   }
 
   const renderFilterPopover = (field: Extract<keyof Filters, SortableTaskFields | 'dateFrom' | 'dateTo'>) => {
-    const isDateRange = field === 'date'; // Special handling for date range
+    const isDateRange = field === 'dateFrom' || field === 'dateTo'; 
     const filterValue = isDateRange ? undefined : filters[field as Exclude<keyof Filters, 'dateFrom' | 'dateTo'>];
 
 
@@ -202,6 +206,10 @@ export function TaskList({
     );
   };
 
+ if (isLoading) {
+    return <div className="text-center text-muted-foreground py-10">Loading tasks...</div>;
+  }
+
 
   if (tasks.length === 0) {
     return <div className="text-center text-muted-foreground py-10">No tasks found. Create a new task or adjust your filters.</div>;
@@ -241,6 +249,7 @@ export function TaskList({
           <TableBody>
             {tasks.map((task) => {
               const TaskIcon = taskTypeIcons[task.taskType] || AlignLeft;
+              console.log("Task date type:", typeof task.date, "Task date value:", task.date);
               return (
                 <TableRow key={task.id}>
                   <TableCell className="py-2.5">{format(parseISO(task.date), 'MMM d, yyyy')}</TableCell>

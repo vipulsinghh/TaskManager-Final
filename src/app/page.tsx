@@ -1,10 +1,9 @@
 
 "use client";
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { PlusCircle, XIcon, Filter } from 'lucide-react';
 import { formatISO, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { TaskForm } from '@/components/task-form';
 import { TaskList } from '@/components/task-list';
@@ -12,6 +11,7 @@ import AppHeader from '@/components/app-header';
 import useLocalStorage from '@/hooks/use-local-storage';
 import type { Task, TaskStatus, SortableTaskFields, TaskType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { getTasks, addTask, updateTask, deleteTask, updateTaskStatus } from '@/lib/firebase';
 import type { Filters, SortConfig } from '@/lib/types';
 
 
@@ -30,30 +30,21 @@ const initialSortConfig: SortConfig = {
   direction: 'desc',
 };
 
-// Use a fixed reference date to ensure sample data is consistent
-const REFERENCE_DATE = new Date(2024, 4, 31); // May 31, 2024 (month is 0-indexed)
-
-const sampleTasks: Task[] = [
-  { id: '1', date: formatISO(subDays(REFERENCE_DATE, 1), { representation: 'date' }), entityName: 'Innovatech Ltd', taskType: 'Meeting', time: '10:00', contactPerson: 'Dr. Evelyn Reed', status: 'open', note: 'Discuss Q3 roadmap and AI integration strategy. Prepare presentation slides.' },
-  { id: '2', date: formatISO(subDays(REFERENCE_DATE, 2), { representation: 'date' }), entityName: 'Synergy Corp', taskType: 'Call', time: '14:30', contactPerson: 'Mr. Samuel Green', status: 'open', note: 'Follow up on contract renewal. Address pricing concerns.' },
-  { id: '3', date: formatISO(subDays(REFERENCE_DATE, 3), { representation: 'date' }), entityName: 'Momentum Dynamics', taskType: 'Email', time: '11:00', contactPerson: 'Ms. Olivia Blue', status: 'closed', note: 'Sent project proposal and NDA. Awaiting feedback.' },
-  { id: '4', date: formatISO(subDays(REFERENCE_DATE, 0), { representation: 'date' }), entityName: 'Quantum Solutions', taskType: 'Follow-up', time: '09:15', contactPerson: 'Mr. Ben Carter', status: 'open', note: 'Check progress on beta testing phase. Gather user feedback.' },
-  { id: '5', date: formatISO(subDays(REFERENCE_DATE, 4), { representation: 'date' }), entityName: 'Apex Innovations', taskType: 'Proposal', time: '16:00', contactPerson: 'Ms. Chloe White', status: 'open', note: 'Finalize and submit grant proposal. Double-check budget section.' },
-  { id: '6', date: formatISO(subDays(REFERENCE_DATE, 5), { representation: 'date' }), entityName: 'Starlight Ventures', taskType: 'Site Visit', time: '13:00', contactPerson: 'Mr. Leo Maxwell', status: 'closed', note: 'Facility tour completed. Assessed operational efficiency. Report submitted.' },
-  { id: '7', date: formatISO(subDays(REFERENCE_DATE, 1), { representation: 'date' }), entityName: 'Nova Systems', taskType: 'Demo', time: '15:00', contactPerson: 'Ms. Sofia Chen', status: 'open', note: 'Product demo for new client. Highlight key features and benefits.' },
-  { id: '8', date: formatISO(subDays(REFERENCE_DATE, 6), { representation: 'date' }), entityName: 'Helios Energy', taskType: 'Contract', time: '10:30', contactPerson: 'Mr. Marcus Allen', status: 'open', note: 'Review and sign service level agreement. Coordinate with legal team.' },
-  { id: '9', date: formatISO(subDays(REFERENCE_DATE, 2), { representation: 'date' }), entityName: 'Zenith Platforms', taskType: 'Other', time: '17:00', contactPerson: 'Ms. Isabella Rossi', status: 'closed', note: 'Internal training session on new software update. All team members attended.' },
-  { id: '10', date: formatISO(subDays(REFERENCE_DATE, 0), { representation: 'date' }), entityName: 'Orion Tech', taskType: 'Call', time: '09:45', contactPerson: 'Mr. Ethan Wright', status: 'open', note: 'Scheduled introductory call with potential new partner. Prepare talking points.' },
-];
-
-
 export default function Home() {
-  const [tasks, setTasks] = useLocalStorage<Task[]>('finstack-tasks', sampleTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [sortConfig, setSortConfig] = useState<SortConfig>(initialSortConfig);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const fetchedTasks = await getTasks() as Task[];
+      setTasks(fetchedTasks);
+    };
+    fetchTasks();
+  }, [filters, sortConfig]); // Add filters and sortConfig to dependency array
 
   const handleOpenForm = (task?: Task) => {
     setEditingTask(task);
@@ -66,24 +57,33 @@ export default function Home() {
       date: formatISO(values.date, { representation: 'date' }),
     };
 
-    if (id) {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === id ? { ...task, ...taskData } : task))
-      );
-      toast({ title: "Task Updated", description: "The task has been successfully updated." });
-    } else {
-      setTasks((prevTasks) => [
-        { ...taskData, id: crypto.randomUUID(), status: 'open' as TaskStatus },
-        ...prevTasks,
-      ]);
-      toast({ title: "Task Created", description: "A new task has been successfully created." });
+    const saveTask = async () => {
+      try {
+        if (id) {
+          await updateTask(id, taskData);
+          toast({ title: "Task Updated", description: "The task has been successfully updated." });
+        } else {
+          await addTask({ ...taskData, status: 'open' as TaskStatus });
+          toast({ title: "Task Created", description: "A new task has been successfully created." });
+        }
+        // Refetch tasks to update the list
+        const updatedTasks = await getTasks() as Task[];
+        setTasks(updatedTasks);
+      } catch (error) {
+        console.error("Error saving task:", error);
+        toast({ title: "Error", description: "There was an error saving the task.", variant: "destructive" });
+      }
+      setIsFormOpen(false);
+      setEditingTask(undefined);
     }
-    setIsFormOpen(false);
-    setEditingTask(undefined);
+    saveTask();
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  const handleDeleteTask = async (taskId: string) => {
+    await deleteTask(taskId);
+    // Refetch tasks to update the list
+    const updatedTasks = await getTasks() as Task[];
+    setTasks(updatedTasks);
     toast({ title: "Task Deleted", description: "The task has been successfully deleted.", variant: "destructive" });
   };
 
@@ -93,7 +93,13 @@ export default function Home() {
         task.id === taskId ? { ...task, status: newStatus } : task
       )
     );
-    toast({ title: "Status Updated", description: `Task marked as ${newStatus}.`});
+    const updateStatus = async () => {
+      await updateTaskStatus(taskId, newStatus);
+      // Refetch tasks to update the list
+      const updatedTasks = await getTasks() as Task[];
+      setTasks(updatedTasks);
+      toast({ title: "Status Updated", description: `Task marked as ${newStatus}.`});
+    }
   };
 
   const handleFilterChange = useCallback(<K extends keyof Filters>(key: K, value: Filters[K]) => {

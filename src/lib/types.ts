@@ -26,6 +26,7 @@ export interface Task {
   contactPerson: string;
   note?: string;
   status: TaskStatus;
+  createdAt?: any; // Or firebase.firestore.Timestamp if you have firebase types installed
 }
 
 export type SortableTaskFields = 'date' | 'entityName' | 'taskType' | 'time' | 'contactPerson' | 'status' | 'note';

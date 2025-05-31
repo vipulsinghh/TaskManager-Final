@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { DatePicker } from '@/components/date-picker';
 import type { Task, TaskStatus, TaskType } from '@/lib/types';
+import { addTask } from '@/lib/firebase';
 import { TASK_STATUSES, TASK_TYPES } from '@/lib/types';
 
 const taskFormSchema = z.object({
@@ -94,8 +95,12 @@ export function TaskForm({ open, onOpenChange, onSubmit, initialData }: TaskForm
   }, [initialData, form, open]);
 
 
-  const handleSubmit = (values: TaskFormValues) => {
-    onSubmit(values, initialData?.id);
+  const handleSubmit = async (values: TaskFormValues) => {
+    if (!initialData) {
+      await addTask(values); // Add task to Firestore
+    } else {
+      onSubmit(values, initialData.id);
+    }
     onOpenChange(false);
   };
 
