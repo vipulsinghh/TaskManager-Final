@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import { Providers } from './providers';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter, Lato } from 'next/font/google';
 
@@ -22,7 +23,9 @@ export default function RootLayout({
         {/* Google Fonts are now managed by next/font */}
       </head>
       <body className="font-inter antialiased">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
       </body>
     </html>
