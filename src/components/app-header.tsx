@@ -55,9 +55,9 @@ const AppHeader = () => {
       <div className="bg-headerPrimary text-headerPrimary-foreground">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-6">
-            <Link href="/" className="flex items-center space-x-2">
-              <FinStackLogo className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold tracking-tight">FinStack</span>
+            <Link href="/" className="flex items-center space-x-1"> {/* Reduced space-x here */}
+              <FinStackLogo className="h-8 w-8" /> {/* Removed text-primary as it's not used by the SVG's explicit fills */}
+              <span className="text-2xl font-bold tracking-tight">inStack</span>
             </Link>
             <div className="hidden md:block">
               <Select defaultValue="companies">
